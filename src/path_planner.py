@@ -9,6 +9,7 @@ class PathPlanner():
                             'ipopt.print_level': 0, 'print_time': 0, 'ipopt.sb': 'yes'}
         self.dynamics = dynamics
         self.N = num_timesteps
+        self.obstacles = []
         
     def solve_min_time(self, x0, xf, u0=None, uf=None, x_bounds=None, u_bounds=None, u_diff_bounds=None):
         '''
@@ -42,6 +43,8 @@ class PathPlanner():
 
         if x_bounds is not None:
             for i in range(self.dynamics.x_shape):
+                if np.isinf(x_bounds[i,0]) and np.isinf(x_bounds[i,1]):
+                    continue
                 opti.subject_to(opti.bounded(x_bounds[i,0], x[i,:], x_bounds[i,1]))
         
         if u_bounds is not None:
@@ -55,7 +58,17 @@ class PathPlanner():
                 for k in range(self.N - 1):
                     opti.subject_to(((u[i,k] - u[i,k+1])/dt)**2 <= (u_diff_bounds[i])**2)
 
+        for ob in self.obstacles:
+            opti.subject_to((x[0,:] - ob['position'][0])**2+(x[1,:] - ob['position'][1])**2 >= ob['radius']**2)
+
         opti.solver('ipopt', self.solver_opts)
 
         sol = opti.solve()
         return sol.value(x), sol.value(u), sol.value(tf)
+    
+    def add_obstacles(self, obstacles):
+        for ob in obstacles:
+            self.add_obstacle(**ob)
+
+    def add_obstacle(self, position, radius):
+        self.obstacles.append({'position': position, 'radius': radius})
