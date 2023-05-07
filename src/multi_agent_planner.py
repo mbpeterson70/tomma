@@ -1,6 +1,7 @@
 import numpy as np
 import casadi
 from casadi import Opti
+import matplotlib.pyplot as plt
 
 class MultiAgentPlanner():
     
@@ -69,8 +70,15 @@ class MultiAgentPlanner():
                     for k in range(self.N - 1):
                         opti.subject_to(((u[m][i,k] - u[m][i,k+1])/dt)**2 <= (u_diff_bounds[i])**2)
 
-        # for ob in self.obstacles:
-        #     opti.subject_to((x[0,:] - ob['position'][0])**2+(x[1,:] - ob['position'][1])**2 >= ob['radius']**2)
+        for ob in self.obstacles:
+            # import ipdb; ipdb.set_trace()
+            # print(self.dynamics.physical_state_idx)
+            # [(x[j,:]) for i, j in enumerate(self.dynamics.physical_state_idx)]
+            # [(ob['position'][i])**2 for i, j in enumerate(self.dynamics.physical_state_idx)]
+            for m in range(self.M):
+            # [(x[j,:] - ob['position'][i])**2 for i, j in enumerate(self.dynamics.physical_state_idx)]
+                opti.subject_to(sum([(x[m][j,:] - ob['position'][i])**2 for i, j in enumerate(self.dynamics.physical_state_idx)]) >= ob['radius']**2)
+
         for m1 in range(self.M):
             for m2 in range(self.M):
                 if m1 == m2:
@@ -80,7 +88,10 @@ class MultiAgentPlanner():
         opti.solver('ipopt', self.solver_opts)
 
         sol = opti.solve()
-        return [sol.value(x[m]) for m in range(self.M)], [sol.value(u[m]) for m in range(self.M)], sol.value(tf)
+        self.x_sol = [sol.value(x[m]) for m in range(self.M)]
+        self.u_sol = [sol.value(u[m]) for m in range(self.M)]
+        self.tf_sol = sol.value(tf)
+        return self.x_sol, self.u_sol, self.tf_sol 
     
     def add_obstacles(self, obstacles):
         for ob in obstacles:
@@ -88,3 +99,19 @@ class MultiAgentPlanner():
 
     def add_obstacle(self, position, radius):
         self.obstacles.append({'position': position, 'radius': radius})
+
+    def draw_path(self):
+        fig, ax = plt.subplots()
+        colors = ['green', 'blue', 'red', 'orange', 'pink']
+
+        for i in range(self.M):
+            ax.plot(self.x_sol[i][self.dynamics.physical_state_idx[0],:], 
+                    self.x_sol[i][self.dynamics.physical_state_idx[1],:],
+                    color=colors[i])
+        
+        for ob in self.obstacles:
+            ax.add_patch(plt.Circle(ob['position'], ob['radius'], facecolor='brown', edgecolor='k'))
+
+        ax.set_aspect('equal')
+
+        return fig, ax
