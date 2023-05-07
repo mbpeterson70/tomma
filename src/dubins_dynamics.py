@@ -26,6 +26,8 @@ class DubinsDynamics():
     def __init__(self, control=CONTROL_LIN_VEL_ANG_VEL):
         self.control = control
         assert self.control == CONTROL_LIN_VEL_ANG_VEL
+        if self.control == CONTROL_LIN_VEL_ANG_VEL:
+            self.physical_state_idx = [0, 1]
     
     def f(self, x, u):
         if self.control == CONTROL_LIN_VEL_ANG_VEL:
