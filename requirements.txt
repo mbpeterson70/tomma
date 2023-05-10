@@ -3,5 +3,5 @@ matplotlib
 ipython
 sympy
 scipy
-pyomo
+casadi
 ipywidgets
