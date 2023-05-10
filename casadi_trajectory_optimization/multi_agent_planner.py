@@ -1,7 +1,6 @@
 import numpy as np
 import casadi
 from casadi import Opti
-import matplotlib.pyplot as plt
 
 class MultiAgentPlanner():
     
@@ -162,6 +161,8 @@ class MultiAgentPlanner():
         self.obstacles.append({'position': position, 'radius': radius})
 
     def draw_path(self):
+        import matplotlib.pyplot as plt
+        
         fig, ax = plt.subplots()
         colors = ['green', 'blue', 'red', 'orange', 'pink']
 
