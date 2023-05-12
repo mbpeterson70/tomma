@@ -1,7 +1,0 @@
-numpy
-matplotlib
-ipython
-sympy
-scipy
-casadi
-ipywidgets
