@@ -114,6 +114,31 @@ class MultiAgentPlanner():
         ''' uf = len n vector. Add constraint at final timestep on input. '''
         self._add_input_constraint(-1, uf)
 
+    def add_obstacles(self, obstacles):
+        for ob in obstacles:
+            self.add_obstacle(**ob)
+
+    def add_obstacle(self, position, radius):
+        self.obstacles.append({'position': position, 'radius': radius})
+
+    def draw_path(self):
+        import matplotlib.pyplot as plt
+        
+        fig, ax = plt.subplots()
+        colors = ['green', 'blue', 'red', 'orange', 'pink']
+
+        for i in range(self.M):
+            ax.plot(self.x_sol[i][self.dynamics.physical_state_idx[0],:], 
+                    self.x_sol[i][self.dynamics.physical_state_idx[1],:],
+                    color=colors[i])
+        
+        for ob in self.obstacles:
+            ax.add_patch(plt.Circle(ob['position'], ob['radius'], facecolor='brown', edgecolor='k'))
+
+        ax.set_aspect('equal')
+
+        return fig, ax
+    
     def _add_dynamic_constraints(self):
         ''' Constrain states at n and n+1 to follow dynamics '''
         for k in range(self.N):
@@ -153,27 +178,3 @@ class MultiAgentPlanner():
                     continue
                 self.opti.subject_to((self.x[m1][0,:] - self.x[m2][0,:])**2+(self.x[m1][1,:] - self.x[m2][1,:])**2 >= self.min_allowable_dist) 
     
-    def add_obstacles(self, obstacles):
-        for ob in obstacles:
-            self.add_obstacle(**ob)
-
-    def add_obstacle(self, position, radius):
-        self.obstacles.append({'position': position, 'radius': radius})
-
-    def draw_path(self):
-        import matplotlib.pyplot as plt
-        
-        fig, ax = plt.subplots()
-        colors = ['green', 'blue', 'red', 'orange', 'pink']
-
-        for i in range(self.M):
-            ax.plot(self.x_sol[i][self.dynamics.physical_state_idx[0],:], 
-                    self.x_sol[i][self.dynamics.physical_state_idx[1],:],
-                    color=colors[i])
-        
-        for ob in self.obstacles:
-            ax.add_patch(plt.Circle(ob['position'], ob['radius'], facecolor='brown', edgecolor='k'))
-
-        ax.set_aspect('equal')
-
-        return fig, ax
