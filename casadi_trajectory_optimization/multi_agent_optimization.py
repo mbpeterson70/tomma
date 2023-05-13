@@ -2,7 +2,7 @@ import numpy as np
 import casadi
 from casadi import Opti
 
-class MultiAgentPlanner():
+class MultiAgentOptimization():
     
     def __init__(self, dynamics, num_agents=1, num_timesteps=100, min_allowable_dist=1.0):
         self.solver_opts = {"ipopt.tol":1e-3, "expand":False,

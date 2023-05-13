@@ -1,6 +1,6 @@
 import numpy as np
 import casadi
-from dynamics import Dynamics
+from casadi_trajectory_optimization.dynamics import Dynamics
 
 class PlanarQuadrotorDynamics(Dynamics):
     
