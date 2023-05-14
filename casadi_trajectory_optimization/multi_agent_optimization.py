@@ -136,6 +136,8 @@ class MultiAgentOptimization():
             ax.add_patch(plt.Circle(ob['position'], ob['radius'], facecolor='brown', edgecolor='k'))
 
         ax.set_aspect('equal')
+        plural = 's' if self.M > 1 else ''
+        ax.set_title(f'{self.M} agent{plural}, {np.round(self.tf_sol, 2)} seconds')
 
         return fig, ax
     
