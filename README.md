@@ -14,7 +14,9 @@ pip install .
 
 ## Code
 
-`MultiAgentOptimization` in `multi_agent_optimization.py` can be used with a dynamics object to optimize trajectories (minimum-time) and perform model predictive control (fixed-time). A library of constraints can be easily added with the use of the `MultiAgentOptimization` class including adding input and state constraints, adding objects, and specifying the minimum distance between agents. See the examples directory for examples of using the `MultiAgentOptimization` class with Dubins and quadrotor dynamics.
+`MultiAgentOptimization` in `multi_agent_optimization.py` can be used with a dynamics object to optimize trajectories (minimum-time) and perform model predictive control (fixed-time). A library of constraints can be easily added with the use of the `MultiAgentOptimization` class including adding input and state constraints, adding objects, and specifying the minimum distance between agents. 
+
+See the [examples](examples/) directory for examples of using the `MultiAgentOptimization` class with Dubins and quadrotor dynamics.
 
 ## See Also
 
