@@ -1,6 +1,7 @@
 import numpy as np
 import casadi
 from casadi_trajectory_optimization.dynamics import Dynamics
+from casadi import sin, cos
 
 class PlanarQuadrotorDynamics(Dynamics):
     
@@ -33,8 +34,8 @@ class PlanarQuadrotorDynamics(Dynamics):
         M = np.array([[self.mc + 2.0*self.mr, 0.0, 0.0],
                       [0.0, self.mc + 2.0*self.mr, 0.0],
                       [0.0, 0.0, self.Jc + 2.0*self.mr*self.d**2]])
-        C = np.array([[-(r_motor+l_motor)*np.sin(th) - self.mu*zdot],
-                      [(r_motor+l_motor)*np.cos(th) - (self.mc+2.0*self.mr)*self.g],
+        C = np.array([[-(r_motor+l_motor)*sin(th) - self.mu*zdot],
+                      [(r_motor+l_motor)*cos(th) - (self.mc+2.0*self.mr)*self.g],
                       [(r_motor-l_motor)*self.d]])
         M_inv_C = np.linalg.inv(M) @ C
         zddot = M_inv_C.item(0)
