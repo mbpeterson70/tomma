@@ -1,6 +1,6 @@
 import numpy as np
 import casadi
-from casadi_trajectory_optimization.dynamics import Dynamics
+from tomma.dynamics import Dynamics
 
 CONTROL_LIN_VEL_ANG_VEL = 0
 CONTROL_LIN_ACC_ANG_VEL = 1

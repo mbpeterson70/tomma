@@ -1,6 +1,6 @@
 import numpy as np
 import casadi
-from casadi_trajectory_optimization.dynamics import Dynamics
+from tomma.dynamics import Dynamics
 from casadi import sin, cos
 
 class PlanarQuadrotorDynamics(Dynamics):

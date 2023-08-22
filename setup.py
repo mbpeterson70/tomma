@@ -1,14 +1,14 @@
 from setuptools import setup
 
 setup(
-    name='casadi_trajectory_optimization',
+    name='tomma',
     version='0.1.0',    
-    description='Trajectory optimization using Casadi',
+    description='Trajectory Optimization for Multiple Model-based Agents',
     url='https://github.com/mbpeterson70/casadi_trajectory_optimization',
     author='Mason Peterson',
     author_email='masonbp@mit.edu',
     license='MIT',
-    packages=['casadi_trajectory_optimization'],
+    packages=['tomma'],
     install_requires=['numpy',
                         'matplotlib',
                         'ipython',

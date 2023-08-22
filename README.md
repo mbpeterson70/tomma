@@ -1,6 +1,8 @@
-# Casadi Trajectory Optimization
+# TOMMA: Trajectory Optimization for Multiple Model-based Agents
 
 ![multiagent](media/multiagent.gif)
+
+Easy-to-use trajectory optimization for multiple agents using (potentially nonlinear) dynamics models.
 
 ## Install
 
@@ -20,4 +22,4 @@ See the [examples](examples/) directory for examples of using the `MultiAgentOpt
 
 ## See Also
 
-[ROS Rover Trajectory Optimization](https://github.com/mbpeterson70/rover_trajectory_opt_ros) is a ROS wrapper for using the casadi trajectory optimization code on ground robots.
+[ROS Rover Trajectory Optimization](https://github.com/mbpeterson70/rover_trajectory_opt_ros) is a ROS wrapper for using the TOMMA code on ground robots.
