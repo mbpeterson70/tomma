@@ -6,7 +6,9 @@ Easy-to-use trajectory optimization for multiple agents using (potentially nonli
 
 ## Install
 
-This setup works well with a python virtual environment.
+TOMMA requires the optimization package, Ipopt. Installation instructions can be found [here](https://github.com/coin-or/Ipopt). Ipopt installation [using coinbrew](https://github.com/coin-or/Ipopt#using-coinbrew) is fairly straightforward.
+
+This setup works well with a python virtual environment. Note: pip may need to be upgrade: `pip install --upgrade pip`
 
 ```
 git clone git@github.com:mbpeterson70/tomma.git
