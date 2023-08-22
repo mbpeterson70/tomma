@@ -9,9 +9,8 @@ Easy-to-use trajectory optimization for multiple agents using (potentially nonli
 This setup works well with a python virtual environment.
 
 ```
-git clone git@github.com:mbpeterson70/casadi_trajectory_optimization.git
-cd casadi_trajectory_optimization
-pip install .
+git clone git@github.com:mbpeterson70/tomma.git
+pip install tomma/
 ```
 
 ## Code
