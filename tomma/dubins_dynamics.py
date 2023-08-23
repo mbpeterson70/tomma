@@ -2,12 +2,32 @@ import numpy as np
 import casadi
 from tomma.dynamics import Dynamics
 
+"""
+CONTROL_LIN_VEL_ANG_VEL:
+    x = [x, y, theta]
+    u = [v, thetadot]
+    
+CONTROL_LIN_ACC_ANG_VEL:
+    x = [x, y, v, theta]
+    u = [vdot, thetadot]
+"""
+
 CONTROL_LIN_VEL_ANG_VEL = 0
 CONTROL_LIN_ACC_ANG_VEL = 1
 
 class DubinsDynamics(Dynamics):
+    """
+    Variable velocity Dubins car dynamics
+    """
     
     def __init__(self, control=CONTROL_LIN_VEL_ANG_VEL):
+        """
+        Constructor.
+
+        Args:
+            control (enum, optional): Control type. See file header for description. Defaults to 
+                CONTROL_LIN_VEL_ANG_VEL.
+        """
         self.control = control
         if self.control == CONTROL_LIN_VEL_ANG_VEL:
             self.physical_state_idx = [0, 1]

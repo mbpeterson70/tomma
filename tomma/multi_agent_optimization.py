@@ -4,22 +4,33 @@ from casadi import Opti
 
 class MultiAgentOptimization():
     
-    def __init__(self, dynamics, num_agents=1, num_timesteps=100, min_allowable_dist=1.0):
+    def __init__(self, dynamics, num_agents=1, num_timesteps=100, min_allowable_dist=1.0,
+                 x_bounds=None, u_bounds=None):
         self.solver_opts = {"ipopt.tol":1e-3, "expand":False,
                             'ipopt.print_level': 0, 'print_time': 0, 'ipopt.sb': 'yes'}
         self.dynamics = dynamics
         self.N = num_timesteps
         self.M = num_agents
         self.min_allowable_dist = min_allowable_dist
-        self.obstacles = []
+        self.obstacles = []       
+        self.x_bounds = x_bounds
+        self.u_bounds = u_bounds 
 
     def solve_opt(self):
+        '''
+        Solve optimization problem.
+        
+        Returns: 
+            (M x n x N+1) states at the beginning of each timestep
+            (M x m x N) control to be applied at the beginning of each timestep
+            (N+1) times
+        '''
         self.opti.solver('ipopt', self.solver_opts)
         sol = self.opti.solve()
         self.x_sol = [sol.value(self.x[m]) for m in range(self.M)]
         self.u_sol = [sol.value(self.u[m]) for m in range(self.M)]
         self.tf_sol = sol.value(self.tf)
-        return self.x_sol, self.u_sol, self.tf_sol 
+        return self.x_sol, self.u_sol, np.linspace(0.0, self.tf_sol, self.N+1)
 
     def setup_mpc_opt(self, x0, xf, tf, Qf=None, x_bounds=None, u_bounds=None):
         '''
@@ -28,9 +39,7 @@ class MultiAgentOptimization():
         tf: end time
         Qf: nxn weighting matrix for xf cost
         '''
-        self.opti = Opti()
-        self.x = [self.opti.variable(self.dynamics.x_shape, self.N+1) for m in range(self.M)]
-        self.u = [self.opti.variable(self.dynamics.u_shape, self.N) for m in range(self.M)]
+        self._general_opt_setup()
         self.tf = tf
         if Qf is None:
             Qf = np.eye(self.dynamics.x_shape)
@@ -52,10 +61,10 @@ class MultiAgentOptimization():
         '''
         x0: nx1 initial state
         xf: nx1 goal state
+        x_bounds and u_bounds override self.x_bounds and self.u_bounds, but uses
+        self.x_bounds and self.u_bounds if no x_bounds or u_bounds is set.
         '''
-        self.opti = Opti()
-        self.x = [self.opti.variable(self.dynamics.x_shape, self.N+1) for m in range(self.M)]
-        self.u = [self.opti.variable(self.dynamics.u_shape, self.N) for m in range(self.M)]
+        self._general_opt_setup()
         self.tf = self.opti.variable()
         self.opti.set_initial(self.tf, tf_guess)
         self.opti.minimize(self.tf)
@@ -64,8 +73,8 @@ class MultiAgentOptimization():
         self._add_dynamic_constraints()
         self._add_state_constraint(0, x0)
         self._add_state_constraint(-1, xf)
-        self.add_x_bounds(x_bounds)
-        self.add_u_bounds(u_bounds)
+        self.add_x_bounds(x_bounds if x_bounds is not None else self.x_bounds)
+        self.add_u_bounds(u_bounds if u_bounds is not None else self.u_bounds)
         self._add_obstacle_constraints()
         self._add_multi_agent_collision_constraints()
 
@@ -121,10 +130,11 @@ class MultiAgentOptimization():
     def add_obstacle(self, position, radius):
         self.obstacles.append({'position': position, 'radius': radius})
 
-    def draw_path(self):
+    def draw_path(self, fig=None, ax=None):
         import matplotlib.pyplot as plt
         
-        fig, ax = plt.subplots()
+        if ax == None:
+            fig, ax = plt.subplots()
         colors = ['green', 'blue', 'red', 'orange', 'pink']
 
         for i in range(self.M):
@@ -140,6 +150,12 @@ class MultiAgentOptimization():
         ax.set_title(f'{self.M} agent{plural}, {np.round(self.tf_sol, 2)} seconds')
 
         return fig, ax
+    
+    def _general_opt_setup(self):
+        ''' Initiate Casadi optimzation '''
+        self.opti = Opti()
+        self.x = [self.opti.variable(self.dynamics.x_shape, self.N+1) for m in range(self.M)]
+        self.u = [self.opti.variable(self.dynamics.u_shape, self.N) for m in range(self.M)]
     
     def _add_dynamic_constraints(self):
         ''' Constrain states at n and n+1 to follow dynamics '''
