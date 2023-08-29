@@ -176,7 +176,8 @@ class MultiAgentOptimization():
         ''' Used to constrain initial and final input conditions '''
         for i in range(self.dynamics.u_shape):
             for m in range(self.M):
-                self.opti.subject_to(self.u[m][i,k] == u.item(i))
+                if not np.isnan(u.item(i)):
+                    self.opti.subject_to(self.u[m][i,k] == u.item(i))
 
     def _add_obstacle_constraints(self):
         ''' Constraints physical state dimensions to not be within obstacle radii '''
