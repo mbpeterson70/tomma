@@ -32,7 +32,7 @@ class MultiAgentOptimization():
         self.tf_sol = sol.value(self.tf)
         return self.x_sol, self.u_sol, np.linspace(0.0, self.tf_sol, self.N+1)
 
-    def setup_mpc_opt(self, x0, xf, tf, Qf=None, x_bounds=None, u_bounds=None):
+    def setup_mpc_opt(self, x0, xf, tf, Qf=None, R=None, x_bounds=None, u_bounds=None):
         '''
         x0: nx1 initial state
         xf: nx1 goal state
@@ -48,6 +48,9 @@ class MultiAgentOptimization():
         mpc_cost = 0.
         for m in range(self.M):
             mpc_cost += (self.x[m][:,-1] - xf.reshape((-1,1))).T @ Qf @ (self.x[m][:,-1] - xf.reshape((-1,1)))
+            if R is not None:
+                for n in range(self.N):
+                    mpc_cost += self.u[m][:,n].T @ R/self.N @ self.u[m][:,n]
         self.opti.minimize(mpc_cost)
 
         self._add_dynamic_constraints()
