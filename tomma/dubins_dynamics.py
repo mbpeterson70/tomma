@@ -1,5 +1,8 @@
-import numpy as np
 import casadi
+try:
+    from casadi import cos, sin
+except:
+    from numpy import cos, sin
 from tomma.dynamics import Dynamics
 
 """
@@ -40,16 +43,16 @@ class DubinsDynamics(Dynamics):
             v, thdot = u[0], u[1]
             
             xdot = casadi.vertcat(
-                v*np.cos(th),
-                v*np.sin(th),
+                v*cos(th),
+                v*sin(th),
                 thdot
             )
         elif self.control == CONTROL_LIN_ACC_ANG_VEL:
             z, y, v, th = x[0], x[1], x[2], x[3]
             vdot, thdot = u[0], u[1]
             xdot = casadi.vertcat(
-                v*np.cos(th),
-                v*np.sin(th),
+                v*cos(th),
+                v*sin(th),
                 vdot,
                 thdot
             )
