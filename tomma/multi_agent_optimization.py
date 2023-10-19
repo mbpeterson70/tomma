@@ -60,12 +60,12 @@ class MultiAgentOptimization():
         self._add_obstacle_constraints()
         self._add_multi_agent_collision_constraints()
         
-    def setup_mpc_with_intermediate_pts_opt(self, x0, xf, tf, xis, Qf=None, R=None, x_bounds=None, u_bounds=None):
+    def setup_mpc_with_waypoints_opt(self, x0, xf, tf, waypoints, Qf=None, R=None, x_bounds=None, u_bounds=None):
         '''
         x0: nx1 initial state
         xf: nx1 goal state
         tf: end time
-        xis: dictionary of timesteps to xs
+        waypoints: dictionary of timesteps to xs
         Qf: nxn weighting matrix for xf cost
         '''
         self._general_opt_setup()
@@ -77,7 +77,7 @@ class MultiAgentOptimization():
         mpc_cost = 0.0
         for m in range(self.M):
             mpc_cost += (self.x[m][:,-1] - xf.reshape((-1,1))).T @ Qf @ (self.x[m][:,-1] - xf.reshape((-1,1)))
-            for i, x in xis.items():
+            for i, x in waypoints.items():
                 mpc_cost += (self.x[m][:,i] - x.reshape((-1, 1))).T @ (self.x[m][:,i] - x.reshape((-1,1)))
             if R is not None:
                 for n in range(self.N):
