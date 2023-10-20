@@ -32,7 +32,7 @@ class MultiAgentOptimization():
         self.tf_sol = sol.value(self.tf)
         return self.x_sol, self.u_sol, np.linspace(0.0, self.tf_sol, self.N+1)
 
-    def setup_mpc_opt(self, x0, xf, tf, Qf=None, R=None, x_bounds=None, u_bounds=None):
+    def setup_mpc_opt(self, x0, xf, tf, waypoints={}, Qf=None, R=None, x_bounds=None, u_bounds=None):
         '''
         x0: nx1 initial state
         xf: nx1 goal state
@@ -46,35 +46,6 @@ class MultiAgentOptimization():
         self.dt = self.tf / self.N
 
         mpc_cost = 0.
-        for m in range(self.M):
-            mpc_cost += (self.x[m][:,-1] - xf.reshape((-1,1))).T @ Qf @ (self.x[m][:,-1] - xf.reshape((-1,1)))
-            if R is not None:
-                for n in range(self.N):
-                    mpc_cost += self.u[m][:,n].T @ R/self.N @ self.u[m][:,n]
-        self.opti.minimize(mpc_cost)
-
-        self._add_dynamic_constraints()
-        self._add_state_constraint(0, x0)
-        self.add_x_bounds(x_bounds)
-        self.add_u_bounds(u_bounds)
-        self._add_obstacle_constraints()
-        self._add_multi_agent_collision_constraints()
-        
-    def setup_mpc_with_waypoints_opt(self, x0, xf, tf, waypoints, Qf=None, R=None, x_bounds=None, u_bounds=None):
-        '''
-        x0: nx1 initial state
-        xf: nx1 goal state
-        tf: end time
-        waypoints: dictionary of timesteps to xs
-        Qf: nxn weighting matrix for xf cost
-        '''
-        self._general_opt_setup()
-        self.tf = tf
-        if Qf is None:
-            Qf = np.eye(self.dynamics.x_shape)
-        self.dt = self.tf / self.N
-
-        mpc_cost = 0.0
         for m in range(self.M):
             mpc_cost += (self.x[m][:,-1] - xf.reshape((-1,1))).T @ Qf @ (self.x[m][:,-1] - xf.reshape((-1,1)))
             for i, x in waypoints.items():
