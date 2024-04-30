@@ -32,7 +32,7 @@ class MultiAgentOptimization():
         self.tf_sol = sol.value(self.tf)
         return self.x_sol, self.u_sol, np.linspace(0.0, self.tf_sol, self.N+1)
 
-    def setup_mpc_opt(self, x0, xf, tf, waypoints={}, Qf=None, R=None, x_bounds=None, u_bounds=None):
+    def setup_mpc_opt(self, x0, xf, tf, waypoints={}, Qf=None, Q_waypoints={}, R=None, x_bounds=None, u_bounds=None):
         '''
         x0: nx1 initial state
         xf: nx1 goal state
@@ -49,7 +49,11 @@ class MultiAgentOptimization():
         for m in range(self.M):
             mpc_cost += (self.x[m][:,-1] - xf.reshape((-1,1))).T @ Qf @ (self.x[m][:,-1] - xf.reshape((-1,1)))
             for i, x in waypoints.items():
-                mpc_cost += (self.x[m][:,i] - x.reshape((-1, 1))).T @ (self.x[m][:,i] - x.reshape((-1,1)))
+                if i in Q_waypoints:
+                    Qi = Q_waypoints[i]
+                else:
+                    Qi = np.eye(self.dynamics.x_shape)
+                mpc_cost += (self.x[m][:,i] - x.reshape((-1, 1))).T @ Qi @ (self.x[m][:,i] - x.reshape((-1,1)))
             if R is not None:
                 for n in range(self.N):
                     mpc_cost += self.u[m][:,n].T @ R/self.N @ self.u[m][:,n]
